@@ -20,8 +20,7 @@ namespace MoviesApp.Controllers
             _context = context;
             _logger = logger;
         }
-
-        // GET: Movies
+        
         [HttpGet]
         public IActionResult Index()
         {
@@ -34,7 +33,7 @@ namespace MoviesApp.Controllers
             }).ToList());
         }
 
-        // GET: Movies/Details/5
+        
         [HttpGet]
         public IActionResult Details(int? id)
         {
@@ -50,8 +49,13 @@ namespace MoviesApp.Controllers
                 Lastname = m.Lastname,
                 BirthdayDate = m.BirthdayDate
             }).FirstOrDefault();
+            var viewMovie = _context.ArtistsMovies.Where(v => v.ArtistId == id).Select(v => new ArtistsMoviesViewModel
+            {
+                ArtistId = v.ArtistId,
+                MovieId = v.MovieId
+            });
 
-            
+
             if (viewModel == null)
             {
                 return NotFound();
@@ -60,16 +64,13 @@ namespace MoviesApp.Controllers
             return View(viewModel);
         }
         
-        // GET: Movies/Create
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Movies/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create([Bind("Firstname,Lastname,BirthdayDate")] InputArtistsViewModel inputModel)
@@ -90,7 +91,6 @@ namespace MoviesApp.Controllers
         }
         
         [HttpGet]
-        // GET: Movies/Edit/5
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -112,10 +112,7 @@ namespace MoviesApp.Controllers
             
             return View(editModel);
         }
-
-        // POST: Movies/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("Firstname,Lastname,BirthdayDate")] EditArtistsViewModel editModel)
@@ -152,7 +149,6 @@ namespace MoviesApp.Controllers
         }
         
         [HttpGet]
-        // GET: Movies/Delete/5
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -175,7 +171,6 @@ namespace MoviesApp.Controllers
             return View(deleteModel);
         }
         
-        // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
