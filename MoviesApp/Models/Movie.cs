@@ -8,7 +8,7 @@ namespace MoviesApp.Models
     {
         public Movie()
         {
-            ArtistsMovie = new HashSet<ArtistsMovie>();
+            ArtistsMovies = new HashSet<ArtistsMovie>();
         }
         public int Id { get; set; }
         public string Title { get; set; }
@@ -17,6 +17,6 @@ namespace MoviesApp.Models
         public DateTime ReleaseDate { get; set; }
         public string Genre { get; set; }
         public decimal Price { get; set; }
-        public virtual ICollection<ArtistsMovie> ArtistsMovie { get; set; }
+        public virtual ICollection<ArtistsMovie> ArtistsMovies { get; set; }
     }
 }

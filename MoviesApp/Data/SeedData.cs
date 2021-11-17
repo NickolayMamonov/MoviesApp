@@ -37,6 +37,14 @@ namespace MoviesApp.Data
                         Genre = "Comedy",
                         Price = 8.99M
                     },
+                    
+                    new Movie
+                    {
+                        Title = "Sharks",
+                        ReleaseDate = DateTime.Parse("2000-5-23"),
+                        Genre = "Comedy",
+                        Price = 15.99M
+                    },
 
                     new Movie
                     {

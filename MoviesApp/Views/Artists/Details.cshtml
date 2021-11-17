@@ -28,7 +28,27 @@
         <dd class = "col-sm-10">
             @Model.Lastname
         </dd>
-        
+        <table class ="table">
+               <thead>
+               <tr>
+                   <th>Title</th>
+                   <th>ReleaseDate</th>
+                   <th>Genre</th>
+                   <th>Price</th>
+                       
+                   </tr>
+               </thead>
+               <tbody>
+                   @foreach(var row in Model.ArtistsMovies){
+                    <tr>
+                        <td>@row.Movie.Title</td>
+                        <td>@row.Movie.ReleaseDate.ToString("dd.mm.yyyy")</td>
+                        <td>@row.Movie.Genre</td>
+                        <td>@row.Movie.Price</td>
+                    </tr>
+                   }
+               </tbody>
+           </table>
      
     </dl>
 </div>

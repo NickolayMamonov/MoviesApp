@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -47,13 +48,11 @@ namespace MoviesApp.Controllers
                 Id = m.Id,
                 Firstname = m.Firstname,
                 Lastname = m.Lastname,
-                BirthdayDate = m.BirthdayDate
+                BirthdayDate = m.BirthdayDate,
+                Movies = (ICollection<Movie>) m.ArtistsMovies.Where(we => we.ArtistId == id).Select(m => m.Movie),
+               ArtistsMovies = (ICollection<ArtistsMovie>) m.ArtistsMovies.Where(we => we.ArtistId == id).Select(m => m) 
             }).FirstOrDefault();
-            var viewMovie = _context.ArtistsMovies.Where(v => v.ArtistId == id).Select(v => new ArtistsMoviesViewModel
-            {
-                ArtistId = v.ArtistId,
-                MovieId = v.MovieId
-            });
+            
 
 
             if (viewModel == null)
@@ -67,27 +66,48 @@ namespace MoviesApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var artist = new InputArtistsViewModel();
+            PopulateAssignedMovieData(artist);
             return View();
         }
 
        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Firstname,Lastname,BirthdayDate")] InputArtistsViewModel inputModel)
+        
+        public IActionResult Create([Bind("Firstname,Lastname,BirthdayDate")] InputArtistsViewModel artist,
+            string[] selOptions)
         {
+            var newArtist = new Artist
+            {
+                Firstname = artist.Firstname,
+                Lastname = artist.Lastname,
+                BirthdayDate = artist.BirthdayDate,
+                ArtistsMovies = artist.ArtistsMovies
+            };
             if (ModelState.IsValid)
             {
-                _context.Artists.Add(new Artist
-                {
-                    Firstname = inputModel.Firstname,
-                    Lastname = inputModel.Lastname,
-                    BirthdayDate = inputModel.BirthdayDate
-                });
+                _context.Artists.Add(newArtist);
                 _context.SaveChanges();
+                if (selOptions != null)
+                {
+                    foreach (var movie in selOptions)
+                    {
+                        var movieToAdd = new ArtistsMovie
+                        {
+                            ArtistId = newArtist.Id,
+                            MovieId = int.Parse(movie)
+                        };
+                        _context.ArtistsMovies.Add(movieToAdd);
+                        _context.SaveChanges();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
-            return View(inputModel);
+
+            PopulateAssignedMovieData(artist);
+            return View(artist);
         }
         
         [HttpGet]
@@ -102,34 +122,40 @@ namespace MoviesApp.Controllers
             {
                 Firstname = m.Firstname,
                 Lastname = m.Lastname,
-                BirthdayDate = m.BirthdayDate
+                BirthdayDate = m.BirthdayDate,
+                ArtistsMovies = m.ArtistsMovies
+                
             }).FirstOrDefault();
             
             if (editModel == null)
             {
                 return NotFound();
             }
-            
+            PopulateAssignedMovieData(editModel);
             return View(editModel);
         }
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("Firstname,Lastname,BirthdayDate")] EditArtistsViewModel editModel)
+        public IActionResult Edit(int id, [Bind("Firstname,Lastname,BirthdayDate")] EditArtistsViewModel editModel,string[] selOptions)
         {
+            var ArtistUP = _context.Artists
+                .Include(a => a.ArtistsMovies)
+                .ThenInclude(am => am.Movie)
+                .SingleOrDefault(a => a.Id == id);
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var artist = new Artist
+                    UpdArtistsMovies(selOptions, ArtistUP);
+                    if (ArtistUP != null)
                     {
-                        Id = id,
-                        Firstname = editModel.Firstname,
-                        Lastname = editModel.Lastname,
-                        BirthdayDate = editModel.BirthdayDate
-                    };
-                    
-                    _context.Update(artist);
+                        ArtistUP.Firstname = editModel.Firstname;
+                        ArtistUP.Lastname = editModel.Lastname;
+                        ArtistUP.BirthdayDate = editModel.BirthdayDate;
+                        _context.Update(ArtistUP);
+                    }
+
                     _context.SaveChanges();
                 }
                 catch (DbUpdateException)
@@ -145,6 +171,7 @@ namespace MoviesApp.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            PopulateAssignedMovieData(editModel);
             return View(editModel);
         }
         
@@ -176,10 +203,69 @@ namespace MoviesApp.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             var artist = _context.Artists.Find(id);
+            var сom = _context.ArtistsMovies.Where(ma => ma.ArtistId == id)
+                .Select(ma => ma).ToList();
+            foreach (var elem in сom)
+            {
+                _context.ArtistsMovies.Remove(elem);
+            }
             _context.Artists.Remove(artist);
             _context.SaveChanges();
             _logger.LogError($"Artist with id {artist.Id} has been deleted!");
             return RedirectToAction(nameof(Index));
+        }
+        private void PopulateAssignedMovieData(InputArtistsViewModel artist)
+        {
+            var allOptions = _context.Movies;
+            var currentOptionIDs = new HashSet<int>(artist.ArtistsMovies.Select(m => m.MovieId));
+            var checkBoxes = new List<OptionsArtists>();
+            foreach (var option in allOptions)
+            {
+                checkBoxes.Add(new OptionsArtists
+                {
+                    Id = option.Id,
+                    Name = option.Title,
+                    Assigned = currentOptionIDs.Contains(option.Id)
+                });
+            }
+
+            ViewData["MovieOptions"] = checkBoxes;
+        }
+        private void UpdArtistsMovies(string[] selOptions, Artist artistToUpdate)
+        {
+            if (selOptions == null)
+            {
+                artistToUpdate.ArtistsMovies = new List<ArtistsMovie>();
+                return;
+            }
+
+            var selOptionsHS = new HashSet<string>(selOptions);
+            var artistOptionsHS = new HashSet<int>(artistToUpdate.ArtistsMovies
+                .Select(m => m.MovieId));
+            foreach (var option in _context.Movies)
+            {
+                if (selOptionsHS.Contains(option.Id.ToString())) // чекбокс выделен
+                {
+                    if (!artistOptionsHS.Contains(option.Id)) // но не отображено в таблице многие-ко-многим
+                    {
+                        artistToUpdate.ArtistsMovies.Add(new ArtistsMovie
+                        {
+                            ArtistId = artistToUpdate.Id,
+                            MovieId = option.Id
+                        });
+                    }
+                }
+                else
+                {
+                    // чекбокс не выделен
+                    if (artistOptionsHS.Contains(option.Id)) // но в таблице многие-ко-многим такое отношение было
+                    {
+                        ArtistsMovie movieToRemove = artistToUpdate.ArtistsMovies
+                            .SingleOrDefault(m => m.MovieId == option.Id);
+                        _context.ArtistsMovies.Remove(movieToRemove ?? throw new InvalidOperationException());
+                    }
+                }
+            }
         }
 
         private bool ArtistExists(int id)
