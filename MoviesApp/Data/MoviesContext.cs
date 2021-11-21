@@ -19,8 +19,8 @@ namespace MoviesApp.Data
                 entity.HasKey(e => new { e.ArtistId, e.MovieId });
             });
         }
-        public virtual DbSet<Movie> Movies { get; set; }
-        public virtual DbSet<Artist> Artists { get; set; }
-        public virtual DbSet<ArtistsMovie> ArtistsMovies { get; set; }
+        public  DbSet<Movie> Movies { get; set; }
+        public  DbSet<Artist> Artists { get; set; }
+        public  DbSet<ArtistsMovie> ArtistsMovies { get; set; }
     }
 }

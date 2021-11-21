@@ -66,7 +66,6 @@ namespace MoviesApp.Controllers
         }
         
         [HttpGet]
-        [ValidateAntiForgeryToken]
         public IActionResult Create()
         {
             InputMovieViewModel movie = new InputMovieViewModel();
@@ -85,7 +84,7 @@ namespace MoviesApp.Controllers
                 Genre = inputModel.Genre,
                 ReleaseDate = inputModel.ReleaseDate,
                 Price = inputModel.Price,
-                ArtistsMovies= inputModel.ArtistsMovies
+                ArtistsMovies = inputModel.ArtistsMovies
             };
             if (ModelState.IsValid)
             {
@@ -126,6 +125,7 @@ namespace MoviesApp.Controllers
             
             ViewData["ArtistOptions"] = checkBoxes;
         }
+        
         
         [HttpGet]
         public IActionResult Edit(int? id)
@@ -249,12 +249,12 @@ namespace MoviesApp.Controllers
                 return;
             }
 
-            var selectedOptionsHS = new HashSet<string>(selOptions);
+            var selOptionsHS = new HashSet<string>(selOptions);
             var movieOptionsHS = new HashSet<int>(movieToUpdate.ArtistsMovies
                 .Select(m => m.ArtistId));
             foreach (var option in _context.Artists)
             {
-                if (selectedOptionsHS.Contains(option.Id.ToString())) // чекбокс выделен
+                if (selOptionsHS.Contains(option.Id.ToString())) // чекбокс выделен
                 {
                     if (!movieOptionsHS.Contains(option.Id)) // но не отображено в таблице многие-ко-многим
                     {
