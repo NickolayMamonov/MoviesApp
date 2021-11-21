@@ -12,7 +12,9 @@ namespace MoviesApp.ViewModels
             ArtistsMovies = new HashSet<ArtistsMovie>();
             Movies = new HashSet<Movie>();
         }
+        [Filters.CustomValidation(4)]
         public string Firstname { get; set; }
+        [Filters.CustomValidation(4)]
         public string Lastname { get; set; }
         
         [DataType(DataType.Date)]

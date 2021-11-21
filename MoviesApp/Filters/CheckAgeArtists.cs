@@ -14,7 +14,7 @@ namespace MoviesApp.Filters
             {
                 age++;
             }
-            if (7 < age || age < 99)
+            if (age is < 7 or > 99)
             {
                 context.Result = new BadRequestResult();
             }
