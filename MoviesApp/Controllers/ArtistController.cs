@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MoviesApp.Data;
+using MoviesApp.Filters;
 using MoviesApp.Models;
 using MoviesApp.ViewModels;
 
@@ -74,6 +75,7 @@ namespace MoviesApp.Controllers
        
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckAgeArtists]
         
         public IActionResult Create([Bind("Firstname,Lastname,BirthdayDate")] InputArtistsViewModel artist,
             string[] selOptions)
@@ -137,6 +139,7 @@ namespace MoviesApp.Controllers
         
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [CheckAgeArtists]
         public IActionResult Edit(int id, [Bind("Firstname,Lastname,BirthdayDate")] EditArtistsViewModel editModel,string[] selOptions)
         {
             var ArtistUP = _context.Artists
