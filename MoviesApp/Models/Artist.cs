@@ -8,7 +8,7 @@ namespace MoviesApp.Models
     {
         public Artist()
         {
-            
+            ArtistsMovies = new HashSet<ArtistsMovie>();
         }
         public int Id { get; set; }
         public string Firstname { get; set; }

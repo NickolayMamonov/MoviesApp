@@ -6,7 +6,9 @@ namespace MoviesApp.ViewModels
 {
     public class ArtistViewModel:InputArtistsViewModel
     {
-        
+        public ArtistViewModel() : base()
+        {
+        }
         public int Id { get; set; }
     }
 }   

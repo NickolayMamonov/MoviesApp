@@ -10,7 +10,6 @@ namespace MoviesApp.ViewModels
         public InputArtistsViewModel()
         {
             ArtistsMovies = new HashSet<ArtistsMovie>();
-            Movies = new HashSet<Movie>();
         }
         [Filters.CustomValidation(4)]
         public string Firstname { get; set; }
@@ -21,6 +20,5 @@ namespace MoviesApp.ViewModels
         public DateTime BirthdayDate { get; set; }
         
         public ICollection<ArtistsMovie> ArtistsMovies { get; set; }
-        public ICollection<Movie> Movies { get; set; }
     }
 }
