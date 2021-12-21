@@ -152,6 +152,7 @@ namespace MoviesApp.Controllers
 
             DeleteArtistsViewModel deleteModel =
                 _mapper.Map<ArtistDto, DeleteArtistsViewModel>(_service.GetArtist((int) id));
+
             
             if (deleteModel == null)
             {
@@ -160,12 +161,13 @@ namespace MoviesApp.Controllers
 
             return View(deleteModel);
         }
-        
+
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
         public IActionResult DeleteConfirmed(int id)
         {
+            var artist = _mapper.Map<ArtistDto>(_service.DeleteArtist(id));
             _logger.LogInformation($"Artist with id {id} has been deleted!");
             return RedirectToAction(nameof(Index));
         }
@@ -186,42 +188,6 @@ namespace MoviesApp.Controllers
 
             ViewData["MovieOptions"] = checkBoxes;
         }
-        /*private void UpdArtistsMovies(string[] selOptions, Artist artistToUpdate)
-        {
-            if (selOptions == null)
-            {
-                artistToUpdate.ArtistsMovies = new List<ArtistsMovie>();
-                return;
-            }
-
-            var selOptionsHS = new HashSet<string>(selOptions);
-            var artistOptionsHS = new HashSet<int>(artistToUpdate.ArtistsMovies
-                .Select(m => m.MovieId));
-            foreach (var option in _context.Movies)
-            {
-                if (selOptionsHS.Contains(option.Id.ToString())) // чекбокс выделен
-                {
-                    if (!artistOptionsHS.Contains(option.Id)) // но не отображено в таблице многие-ко-многим
-                    {
-                        artistToUpdate.ArtistsMovies.Add(new ArtistsMovie
-                        {
-                            ArtistId = artistToUpdate.Id,
-                            MovieId = option.Id
-                        });
-                    }
-                }
-                else
-                {
-                    // чекбокс не выделен
-                    if (artistOptionsHS.Contains(option.Id)) // но в таблице многие-ко-многим такое отношение было
-                    {
-                        ArtistsMovie movieToRemove = artistToUpdate.ArtistsMovies
-                            .SingleOrDefault(m => m.MovieId == option.Id);
-                        _context.ArtistsMovies.Remove(movieToRemove ?? throw new InvalidOperationException());
-                    }
-                }
-            }
-        }*/
 
         private bool ArtistExists(int id)
         {

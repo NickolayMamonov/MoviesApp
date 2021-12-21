@@ -16,7 +16,7 @@ namespace MoviesApp.Services.Dto
         public string LastName { get; set; }
         
         [DataType(DataType.Date)]
-        public DateTime Birthday { get; set; }
+        public DateTime BirthdayDate { get; set; }
 
         public virtual ICollection<ArtistsMovie> ArtistsMovies { get; set; }
         

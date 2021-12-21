@@ -159,6 +159,7 @@ namespace MoviesApp.Controllers
         
         [HttpGet]
         [Authorize(Roles = "Admin")] 
+        // GET: Movies/Delete/5
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -166,8 +167,6 @@ namespace MoviesApp.Controllers
                 return NotFound();
             }
             DeleteMovieViewModel deleteModel = _mapper.Map<MovieDto, DeleteMovieViewModel>(_service.GetMovie((int) id));
-
-            
             if (deleteModel == null)
             {
                 return NotFound();
@@ -175,13 +174,14 @@ namespace MoviesApp.Controllers
 
             return View(deleteModel);
         }
-        
+
         // POST: Movies/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")] 
         public IActionResult DeleteConfirmed(int id)
         {
+            var movie = _mapper.Map<MovieDtoApi>(_service.DeleteMovie(id));
             _logger.LogInformation($"Movie with id {id} has been deleted!");
             return RedirectToAction(nameof(Index));
         }

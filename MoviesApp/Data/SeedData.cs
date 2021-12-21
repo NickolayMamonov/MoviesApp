@@ -15,7 +15,7 @@ namespace MoviesApp.Data
                 serviceProvider.GetRequiredService<
                     DbContextOptions<MoviesContext>>()))
             {
-                // Look for any movies.if (!context.Movies.Any())
+                if (!context.Movies.Any())
                 {
                     context.Movies.AddRange(
                         new Movie

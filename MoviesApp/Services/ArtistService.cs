@@ -55,7 +55,7 @@ namespace MoviesApp.Services
                 {
                     artistToUpdate.Firstname = artistDto.FirstName;
                     artistToUpdate.Lastname = artistDto.LastName;
-                    artistToUpdate.BirthdayDate = artistDto.Birthday;
+                    artistToUpdate.BirthdayDate = artistDto.BirthdayDate;
                     _context.Update(artistToUpdate);
                     _context.SaveChanges();
                 }
@@ -192,7 +192,7 @@ namespace MoviesApp.Services
                 {
                     artistToUpdate.Firstname = artistDto.FirstName;
                     artistToUpdate.Lastname = artistDto.LastName;
-                    artistToUpdate.BirthdayDate = artistDto.Birthday;
+                    artistToUpdate.BirthdayDate = artistDto.BirthdayDate;
                     _context.Artists.Update(artistToUpdate);
                     _context.SaveChanges();
                 }
